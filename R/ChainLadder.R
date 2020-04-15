@@ -22,7 +22,15 @@ chainladder <- function(Triangle, weights=1,
     delta <- rep(delta,(n-1))[1:(n-1)]
 
     lmCL <- function(i, Triangle){
-      lm(y~x+0, weights=weights[,i]/Triangle[,i]^delta[i],
+      
+      iweights = weights[,i]/Triangle[,i]^delta[i]
+      isinf = which(Triangle[,i] == 0)
+      
+      if(length(isinf)>0){
+        iweights[isinf] <- mean(iweights[-isinf])
+      }
+      
+      lm(y~x+0, weights=iweights,
          data=data.frame(x=Triangle[,i], y=Triangle[,i+1]))
     } 
     myModel <- lapply(c(1:(n-1)), lmCL, Triangle)
